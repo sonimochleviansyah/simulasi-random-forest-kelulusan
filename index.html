@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Simulasi Random Forest – Kelulusan Tepat Waktu Mahasiswa</title>
+    <style>
+      :root {
+        --bg: #fff;
+        --fg: #1c2a1c;
+        --mut: #5b6b5b;
+        --card: #f3f8ee;
+        --bd: #cfdcc2;
+        --g: #3f8a14;
+        --gl: #92d050;
+        --o: #e8702a;
+        --in: #fff;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          color-scheme: dark;
+          --bg: #12180f;
+          --fg: #e6efe0;
+          --mut: #9fb096;
+          --card: #1b2418;
+          --bd: #33432d;
+          --g: #8fd05a;
+          --in: #0e130c;
+        }
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --bg: #12180f;
+        --fg: #e6efe0;
+        --mut: #9fb096;
+        --card: #1b2418;
+        --bd: #33432d;
+        --g: #8fd05a;
+        --in: #0e130c;
+      }
+      html {
+        scroll-padding-top: env(safe-area-inset-top, 0px);
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 18px 14px 48px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 2px;
+      }
+      h2 {
+        font-size: 17px;
+        margin: 0 0 8px;
+      }
+      p.s {
+        color: var(--mut);
+        margin: 0 0 14px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--bd);
+        border-radius: 12px;
+        padding: 14px;
+        margin: 0 0 14px;
+      }
+      label {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        margin: 0 12px 8px 0;
+        font-size: 14px;
+      }
+      input,
+      select,
+      textarea,
+      button {
+        font: inherit;
+        color: var(--fg);
+        background: var(--in);
+        border: 1px solid var(--bd);
+        border-radius: 8px;
+        padding: 6px 8px;
+      }
+      input[type="number"] {
+        width: 72px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 150px;
+        font:
+          12.5px/1.4 ui-monospace,
+          Menlo,
+          monospace;
+      }
+      button {
+        background: var(--g);
+        color: #fff;
+        border-color: var(--g);
+        cursor: pointer;
+        font-weight: 600;
+        padding: 8px 16px;
+      }
+      :root[data-theme="dark"] button,
+      :root:not([data-theme="light"]) button {
+        color: #0e130c;
+      }
+      button.g {
+        background: transparent;
+        color: var(--fg);
+        border-color: var(--bd);
+        font-weight: 400;
+      }
+      .sc {
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        font-size: 13px;
+        margin: 6px 0;
+        min-width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid var(--bd);
+        padding: 4px 8px;
+        text-align: center;
+        white-space: nowrap;
+      }
+      th {
+        background: var(--bd);
+      }
+      td.l {
+        text-align: left;
+      }
+      tr.a td {
+        font-weight: 700;
+        background: rgba(146, 208, 80, 0.18);
+      }
+      details {
+        border: 1px solid var(--bd);
+        border-radius: 8px;
+        padding: 6px 10px;
+        margin: 6px 0;
+        background: var(--in);
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .tg {
+        color: var(--g);
+      }
+      .m {
+        color: var(--mut);
+        font-size: 13px;
+      }
+      .tree {
+        overflow-x: auto;
+        padding: 10px 0;
+        text-align: center;
+      }
+      .tree ul {
+        display: flex;
+        justify-content: center;
+        padding: 18px 0 0;
+        margin: 0;
+        list-style: none;
+        position: relative;
+      }
+      .tree li {
+        position: relative;
+        padding: 18px 6px 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .tree li::before,
+      .tree li::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 50%;
+        width: 50%;
+        height: 18px;
+        border-top: 2px solid #a9d98a;
+      }
+      .tree li::after {
+        right: auto;
+        left: 50%;
+        border-left: 2px solid #a9d98a;
+      }
+      .tree li:only-child::before,
+      .tree li:only-child::after {
+        display: none;
+      }
+      .tree li:only-child {
+        padding-top: 0;
+      }
+      .tree li:first-child::before,
+      .tree li:last-child::after {
+        border: 0;
+      }
+      .tree li:last-child::before {
+        border-right: 2px solid #a9d98a;
+        border-radius: 0 6px 0 0;
+      }
+      .tree li:first-child::after {
+        border-radius: 6px 0 0 0;
+      }
+      .tree ul ul::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        border-left: 2px solid #a9d98a;
+        height: 18px;
+      }
+      .e {
+        font-size: 11px;
+        color: var(--mut);
+        background: var(--bg);
+        padding: 0 4px;
+        margin-bottom: 2px;
+      }
+      .n {
+        display: inline-block;
+        background: #92d050;
+        color: #102008;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .n.lf {
+        border-radius: 8px;
+      }
+      .hi > .e {
+        color: var(--o);
+        font-weight: 700;
+      }
+      .hi > .n {
+        outline: 3px solid var(--o);
+      }
+      .res {
+        font-size: 18px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Simulasi Random Forest</h1>
+      <p class="s">
+        Prediksi Kelulusan Tepat Waktu Mahasiswa · Soni Moch Leviansyah (301240030) · Universitas
+        Bale Bandung
+      </p>
+      <div class="card">
+        <h2>1. Data dan Parameter</h2>
+        <p class="m">
+          Format CSV: baris pertama nama kolom, kolom terakhir adalah label. Semua atribut bersifat
+          kategorikal. Anda bisa menempel data sendiri.
+        </p>
+        <textarea id="csv" spellcheck="false"></textarea>
+        <p>
+          <label>Jumlah pohon <input type="number" id="nt" value="3" min="1" max="25" /></label>
+          <label>m atribut acak <input type="number" id="mm" value="2" min="1" max="10" /></label>
+          <label>Seed <input type="number" id="sd" value="7" /></label>
+          <label><input type="checkbox" id="pre" checked /> Pakai pengacakan laporan</label>
+        </p>
+        <button id="run">Jalankan Simulasi</button> <button class="g" id="rst">Data contoh</button>
+      </div>
+      <div id="out"></div>
+      <div class="card" id="pc" hidden>
+        <h2>4. Prediksi Data Baru (Mayoritas Vote)</h2>
+        <div id="pf"></div>
+        <button id="pb">Prediksi</button>
+        <div id="pr" style="margin-top: 10px"></div>
+      </div>
+    </main>
+    <script>
+      const SAMPLE = `IPK,Kehadiran,Organisasi,Kerja,Lulus Tepat Waktu
+Rendah,Kurang,Tidak,Ya,Tidak
+Rendah,Kurang,Tidak,Tidak,Tidak
+Sedang,Baik,Tidak,Ya,Ya
+Tinggi,Cukup,Tidak,Ya,Ya
+Tinggi,Baik,Ya,Ya,Ya
+Tinggi,Kurang,Ya,Tidak,Tidak
+Sedang,Baik,Ya,Tidak,Ya
+Rendah,Cukup,Tidak,Ya,Tidak
+Rendah,Baik,Ya,Ya,Ya
+Tinggi,Cukup,Ya,Ya,Ya
+Rendah,Cukup,Ya,Tidak,Ya
+Sedang,Cukup,Tidak,Tidak,Ya
+Sedang,Baik,Ya,Ya,Ya
+Tinggi,Kurang,Tidak,Tidak,Tidak`;
+      const PRE = [
+        {
+          idx: [6, 3, 7, 11, 1, 2, 14, 9, 2, 6, 10, 1, 9, 4],
+          m: {
+            1: ["IPK", "Kerja"],
+            1.1: ["Kehadiran", "Organisasi"],
+            1.2: ["IPK", "Organisasi"],
+            "1.2.1": ["IPK", "Kehadiran"],
+          },
+        },
+        {
+          idx: [1, 14, 10, 2, 4, 11, 11, 10, 1, 10, 10, 7, 1, 4],
+          m: { 1: ["IPK", "Organisasi"], 1.1: ["IPK", "Kehadiran"] },
+        },
+        { idx: [7, 3, 9, 2, 10, 5, 9, 14, 11, 3, 2, 10, 10, 11], m: { 1: ["Kehadiran", "Kerja"] } },
+      ];
+      const $ = (id) => document.getElementById(id);
+      const f = (x) => (Math.abs(x) < 1e-12 ? 0 : x).toFixed(6).replace(".", ",");
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+      let DATA,
+        ATTR,
+        LAB,
+        TREES = [];
+      function parse(t) {
+        const L = t
+          .trim()
+          .split(/\r?\n/)
+          .map((l) => l.split(/[,;\t]/).map((c) => c.trim()));
+        const h = L.shift();
+        if (h.length < 2 || !L.length) throw Error("Data tidak valid");
+        const rows = L.filter((r) => r.length === h.length).map((r, i) => ({
+          no: i + 1,
+          v: r.slice(0, -1),
+          y: r[r.length - 1],
+        }));
+        return { attrs: h.slice(0, -1), lab: h[h.length - 1], rows };
+      }
+      function rng(s) {
+        return () => {
+          s |= 0;
+          s = (s + 0x6d2b79f5) | 0;
+          let t = Math.imul(s ^ (s >>> 15), 1 | s);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const cnt = (rows) => {
+        const c = {};
+        rows.forEach((r) => (c[r.y] = (c[r.y] || 0) + 1));
+        return c;
+      };
+      const ent = (rows) => {
+        const n = rows.length;
+        return Object.values(cnt(rows)).reduce((a, k) => a - (k / n) * Math.log2(k / n), 0);
+      };
+      function analyze(rows, ai) {
+        const n = rows.length,
+          E = ent(rows),
+          parts = new Map();
+        rows.forEach((r) => {
+          const v = r.v[ai];
+          if (!parts.has(v)) parts.set(v, []);
+          parts.get(v).push(r);
+        });
+        let g = E,
+          si = 0;
+        const info = [];
+        parts.forEach((p, v) => {
+          const w = p.length / n,
+            e = ent(p),
+            s = -w * Math.log2(w);
+          g -= w * e;
+          si += s;
+          info.push({ v, p, e, s });
+        });
+        return { gain: g, si, gr: si ? g / si : 0, parts, info };
+      }
+      function build(rows, attrs, id, ctx) {
+        const c = cnt(rows),
+          ks = Object.keys(c);
+        const maj = ks.sort((a, b) => c[b] - c[a])[0];
+        if (ks.length === 1 || !attrs.length) return { id, leaf: maj };
+        let m = ctx.pre && ctx.pre.m[id] ? ctx.pre.m[id].slice() : null;
+        if (!m) {
+          const a = attrs.slice();
+          for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(ctx.r() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+          }
+          m = a.slice(0, Math.min(ctx.m, a.length));
+        }
+        const res = {};
+        m.forEach((a) => (res[a] = analyze(rows, ATTR.indexOf(a))));
+        let b = m[0];
+        m.forEach((a) => {
+          if (res[a].gr > res[b].gr + 1e-12) b = a;
+        });
+        if (res[b].gain <= 1e-12) return { id, leaf: maj };
+        const node = { id, attr: b, ch: [] };
+        ctx.steps.push({ id, rows, m, res, b, E: ent(rows), c });
+        let i = 1;
+        res[b].parts.forEach((p, v) => {
+          node.ch.push([
+            v,
+            build(
+              p,
+              attrs.filter((a) => a !== b),
+              id + "." + i,
+              ctx,
+            ),
+          ]);
+          i++;
+        });
+        return node;
+      }
+      function path(node, x, hi = new Set()) {
+        while (node.attr) {
+          hi.add(node.id);
+          const v = x[ATTR.indexOf(node.attr)];
+          const nx = node.ch.find((c) => c[0] === v);
+          if (!nx) return { hi, pred: null };
+          node = nx[1];
+        }
+        hi.add(node.id);
+        return { hi, pred: node.leaf };
+      }
+      function treeHTML(n, hi) {
+        const on = hi && hi.has(n.id);
+        if (n.leaf !== undefined)
+          return `<li class="${on ? "hi" : ""}"><span class="n lf">${esc(n.leaf)}</span></li>`;
+        return `<li class="${on ? "hi" : ""}"><span class="n">${n.id === "1" ? "" : n.id + " "}${esc(n.attr)}</span><ul>${n.ch
+          .map(([v, c]) => {
+            const k = treeHTML(c, hi).replace("<li ", `<li data-e="1" `);
+            return k.replace(">", `><span class="e">${esc(v)}</span>`);
+          })
+          .join("")}</ul></li>`;
+      }
+      function drawTree(t, hi) {
+        return `<div class="tree"><ul>${treeHTML(t, hi)}</ul></div>`;
+      }
+      function stepHTML(s) {
+        const N = s.rows.length,
+          ks = Object.keys(s.c);
+        let h = `<details><summary>Node ${s.id} · ${N} data · Entropy ${f(s.E)} → pilih <span class="tg">${esc(s.b)}</span></summary><div class="sc"><table><tr><th>Atribut</th><th>Nilai</th><th>Jumlah</th>${ks.map((k) => `<th>${esc(k)}</th>`).join("")}<th>Entropy</th><th>Gain</th><th>Split Info</th><th>Gain Ratio</th></tr>`;
+        s.m.forEach((a) => {
+          const r = s.res[a];
+          h += `<tr class="a"><td class="l">${esc(a)}</td><td></td><td></td>${ks.map(() => "<td></td>").join("")}<td></td><td>${f(r.gain)}</td><td>${f(r.si)}</td><td>${f(r.gr)}</td></tr>`;
+          r.info.forEach((i) => {
+            const c = cnt(i.p);
+            h += `<tr><td></td><td class="l">${esc(i.v)}</td><td>${i.p.length}</td>${ks.map((k) => `<td>${c[k] || 0}</td>`).join("")}<td>${f(i.e)}</td><td></td><td>${f(i.s)}</td><td></td></tr>`;
+          });
+        });
+        return (
+          h +
+          `</table></div><p class="m">Gain = Entropy(S) − Σ(|Si|/|S|)·Entropy(Si); Split Info = Σ −(|Si|/|S|)·log₂(|Si|/|S|); Gain Ratio = Gain / Split Info.</p></details>`
+        );
+      }
+      function run() {
+        try {
+          const d = parse($("csv").value);
+          DATA = d.rows;
+          ATTR = d.attrs;
+          LAB = d.lab;
+        } catch (e) {
+          $("out").innerHTML = `<div class="card">${esc(e.message)}</div>`;
+          return;
+        }
+        const nt = Math.max(1, Math.min(25, +$("nt").value || 3)),
+          mm = Math.max(1, +$("mm").value || 2),
+          r = rng(+$("sd").value || 0);
+        const usePre = $("pre").checked && $("csv").value.trim() === SAMPLE && nt === 3 && mm === 2;
+        TREES = [];
+        let html = "";
+        for (let k = 0; k < nt; k++) {
+          const pre = usePre ? PRE[k] : null;
+          const idx = pre
+            ? pre.idx
+            : Array.from({ length: DATA.length }, () => 1 + Math.floor(r() * DATA.length));
+          const S = idx.map((i) => DATA[i - 1]),
+            ctx = { r, m: mm, pre, steps: [] };
+          const t = build(S, ATTR.slice(), "1", ctx);
+          TREES.push(t);
+          html += `<div class="card"><h2>Pohon ${k + 1}</h2><p class="m"><b>Bootstrap sampling</b> (data ke-): ${idx.join(", ")}</p>
+  <div class="sc"><table><tr><th>No</th>${ATTR.map((a) => `<th>${esc(a)}</th>`).join("")}<th>${esc(LAB)}</th></tr>${S.map((x) => `<tr><td>${x.no}</td>${x.v.map((v) => `<td>${esc(v)}</td>`).join("")}<td>${esc(x.y)}</td></tr>`).join("")}</table></div>
+  <h2 style="margin-top:12px">Langkah per node</h2>${ctx.steps.map(stepHTML).join("") || "<p class=m>Semua data sudah satu kelas.</p>"}
+  <h2 style="margin-top:12px">Pohon keputusan</h2><div id="tr${k}">${drawTree(t)}</div></div>`;
+        }
+        $("out").innerHTML = html;
+        $("pf").innerHTML = ATTR.map(
+          (a, i) =>
+            `<label>${esc(a)} <select data-i="${i}">${[...new Set(DATA.map((x) => x.v[i]))].map((v) => `<option>${esc(v)}</option>`).join("")}</select></label>`,
+        ).join("");
+        $("pc").hidden = false;
+        $("pr").innerHTML = "";
+      }
+      function predict() {
+        const x = [...document.querySelectorAll("#pf select")].map((s) => s.value),
+          votes = {};
+        let rows = "";
+        TREES.forEach((t, k) => {
+          const { hi, pred } = path(t, x);
+          $("tr" + k).innerHTML = drawTree(t, hi);
+          const p = pred || "(tidak ada cabang)";
+          votes[p] = (votes[p] || 0) + 1;
+          rows += `<tr><td>${k + 1}</td><td>${esc(p)}</td></tr>`;
+        });
+        const w = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+        $("pr").innerHTML =
+          `<div class="sc"><table><tr><th>Pohon</th><th>Hasil</th></tr>${rows}</table></div><p class="res">Mayoritas vote: <span class="tg">${esc(w[0][0])}</span> (${w.map(([k, v]) => esc(k) + " " + v).join(", ")})</p><p class="m">Jalur prediksi ditandai oranye pada pohon di atas.</p>`;
+      }
+      $("csv").value = SAMPLE;
+      $("run").onclick = run;
+      $("pb").onclick = predict;
+      $("rst").onclick = () => {
+        $("csv").value = SAMPLE;
+        $("nt").value = 3;
+        $("mm").value = 2;
+        $("sd").value = 7;
+        run();
+      };
+      run();
+    </script>
+  </body>
+</html>
