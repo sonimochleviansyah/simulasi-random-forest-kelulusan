@@ -17,7 +17,7 @@
 
 <br>
 
-[🚀 **Buka Web Simulasi**](https://simulasi-random-forest-kelulusan.vercel.app/) · [🎬 **Video Tutorial**](ISI_LINK_YOUTUBE) · 
+[🚀 **Buka Web Simulasi**](https://simulasi-random-forest-kelulusan.vercel.app/) · [🎬 **Video Tutorial**](https://youtu.be/KGC7652y9uE?si=k0mjEvp4-vvQkt7e) · 
 
 </div>
 
@@ -244,7 +244,7 @@ random-forest-kelulusan-tepat-waktu/
 | Dokumen | Tautan |
 |---|---|
 | 🌐 Web simulasi | [ISI_LINK_VERCEL](https://simulasi-random-forest-kelulusan.vercel.app/) |
-| 🎬 Video tutorial | [ISI_LINK_YOUTUBE](ISI_LINK_YOUTUBE) |
+| 🎬 Video tutorial | [ISI_LINK_YOUTUBE](https://youtu.be/KGC7652y9uE?si=k0mjEvp4-vvQkt7e) |
 
 ---
 
