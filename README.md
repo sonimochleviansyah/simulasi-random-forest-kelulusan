@@ -17,7 +17,7 @@
 
 <br>
 
-[🚀 **Buka Web Simulasi**](ISI_LINK_VERCEL) · [🎬 **Video Tutorial**](ISI_LINK_YOUTUBE) · [📄 **Laporan**](#-dokumen-tugas)
+[🚀 **Buka Web Simulasi**](https://simulasi-random-forest-kelulusan.vercel.app/) · [🎬 **Video Tutorial**](ISI_LINK_YOUTUBE) · 
 
 </div>
 
@@ -243,9 +243,8 @@ random-forest-kelulusan-tepat-waktu/
 
 | Dokumen | Tautan |
 |---|---|
-| 🌐 Web simulasi | [ISI_LINK_VERCEL](ISI_LINK_VERCEL) |
+| 🌐 Web simulasi | [ISI_LINK_VERCEL](https://simulasi-random-forest-kelulusan.vercel.app/) |
 | 🎬 Video tutorial | [ISI_LINK_YOUTUBE](ISI_LINK_YOUTUBE) |
-| 📘 Laporan project dan tutorial | Dikumpulkan melalui Edlink |
 
 ---
 
